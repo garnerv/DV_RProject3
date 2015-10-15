@@ -1,11 +1,11 @@
-setwd("C:/Users/Wes James/Documents/Data Visualization/DV_RProject3/01 Data")
+setwd("/Users/Garner/DV_RProject3/01 Data")
 file_path <- "2010IncomeData.csv"
 
 # str(df) # Uncomment this and  run just the lines to here to get column types to use for getting the list of measures.
 
 df <- read.csv(file_path, stringsAsFactors = FALSE)
 
-measures <- c("STATEFIPS",	"ZIPCODE",	"TotalReturns",	"AdjustGrossIncome",	"SalariesWages",	"NetIncome")
+measures <- c("STATEFIPS",	"TotalReturns",	"AdjustGrossIncome",	"SalariesWages",	"NetIncome")
 
 #measures <- NA # Do this if there are no measures.
 

@@ -1,5 +1,5 @@
 ---
-title: "Project 2: Collegiate CSV file"
+title: "Project 3: Joining CSV files"
 output:
   html_document:
     pandoc_args: [
@@ -7,15 +7,14 @@ output:
       "-RTS"
     ]
 ---
-For analysis, we are using a database of US college financial aid information made available through the US Department of Education College Affordability and Transparency Center. We hope to visualize some trends present in current college financial aid distributions throughout the nation. "Null" data points represent statstics that were unreported by their respective universities.
+For analysis, we are using two databases. One has US census data from 2010 by zipcode. The other has US income tax information from 2010 by zip code. In analysis, we will employ joins and piping techniques to wrangle the data in order to produce interesting visualizations.
 
 ###Reproducing Our Work:
 1. Create a GitHub repository for the project.
 2. Create the folders for your project.
-3. Find a csv file for statistical comparisons. Our CSV file was obtained by selecting the appropriate options from the website: http://collegecost.ed.gov/catc/Default.aspx
-4. Clean up variable names using "college data wranging.r" file and use output to create SQL table in SQL Developer.
-5. Import CSV into SQL Developer
-6. Build an html file to document these steps.
+3. Find a csv file for statistical comparisons. Our CSV files were found on www.data.gov.
+4. Import CSV into SQL Developer
+5. Build an html file to document these steps.
 
 Before generating plots, we run the 'require.r' file to make sure the necessary packages are in place.
 ```{r}
@@ -23,53 +22,29 @@ source("../require.R")
 ```
 
 ###Summary and Subset:
-The SQL used on the table selects all colleges where the tutition and fees for the 2013-2014 academic year were not zero. This selection means that schools such as the "United States Air Force Academy" were not included in this analysis because they do not have tutition and fees.
+The SQL used on the table selects all census and income information. A summary and head are displayed for each data frame.
 ```{r, echo=TRUE}
 source("../01 Data/summary.R", echo = TRUE)
 ```
 
 ###Plot #1:
-SQL used to isolate the data for this dataframe selected the entire table and excluded universities with tutition and fee values for the 2013-2014 academic year of zero dollars.
+First, the income and census data frames were joined by zip code using a dpylr inner join function. Then, two new columns were added to the new table. We found the percentage of single mother households in each zip code, and then made another new column to analyze them by percentile. (singleMotherP and mother_percentile)
 
-This plot uses some advanced piping techniques in R including the use of the cumulative distribution function. The visualization shows the average dollar amount of institutional grant money offered to college freshmen broken down by percentile vs. the school's tuition and fees for the 2013-2014 academic school year.
+Next, we found the average salaries and wages reported on each income tax return by the population size in each zip code. (avgIncome)
 
-Before analyzing this visualization, it is important to note that our data includes 1216 private not-for-profit schools, 560 public schools, and 303 private-for-profit schools.
+We then classified each zip code by its relative population size using the cumulative distribution of the size of the population. The categories "Small", "Medium", and "Large" represent the smallest third, medium third, and largest zip codes by population size percentile.
 
-There are several things going on in this first visualization. In the bottom quartile of the data, there are more private-for-profit universities than any other type of university. Private not-for-profit universities seem to appear in least frequency in the top quartile of the data. In the top half of the data, there appear to be more public universities than any other type of university.
+Finally, we mutated the average income column into percentiles for analysis and facet wrapped them for easy viewing.
 
-Questions that arise from this visualization include:
-1. Public universities seem to be offering institutional grants worth more than private not-for-profit universities, despite the fact that most all private not-for-profit schools have higher tuition and fees than their public counterparts. Are private not-for-profit universities overcharging for their services?
+The first interesting thing about this plot is that there is a solid correlation between zip code population size and average salaries/wages per individual in that population. Secondly, we notice that the large zip code areas appear to have more single mother households than the small zip code areas. The medium size zip codes are perfectly in the middle. 
 
-2. Private for-profit universities seem to appear most often in the top half of all universities, meaning they offer fairly weighty grants  to their freshmen, but their tuition and fees are not as high as not-for-profit colleges. What's going on here?
+Finally, it appears that zip codes with more single mothers tend to have relatively smaller wages/salaries per individual - note the heavy grouping of points in the top left of each zip code size grouping. Also note here is that there is a shift toward higher relative salary AND higher relative single mother house holds per zip code the larger the zip code is. 
+
+Leading Questions About this Data:
+1. Are single mother households forced to take lesser paying jobs to take care of their children? (The classic career for child sacrifice)
+
+2. Why does increasing zip code population size correlate with increased single mother households AND increased salaries per person?
 
 ```{r}
 source("../02 Data Wrangling/plot1.R", echo = TRUE)
 ```
-
-###Plot #3:
-SQL used to isolate the data for this dataframe selected the entire table and excluded universities with tutition and fee values for the 2013-2014 academic year of zero dollars.
-
-This plot uses some advanced piping techniques in R including the use of the cumulative distribution function. The visualization shows mean student faculty ratio of colleges vs mean tuition and fees for the 13-14 academic school year, grouped by quartile of average pell grant recipient amount and public/private for-profit/private not-for-profit schools. 
-
-R workflow employed in the generation of this visualization included the following steps:
-1. Mutate data frame to create a new column, "pell_percent", which contains the cumulative distribution value for each college's average first time undergraduate student's pell grant dollar amount.
-2. Create vector called "levels" to designate quartiles for cumulative distribution values.
-3. Create vector called "labels" which appropriate label quartiles.
-4. Mutate data frame to create a new column which labels which quartile the college is in, dynamically applying the label using the cut function in tandem with the vectors mentioned in steps 2 and 3, put into column "x".
-5. Group data frame by "x" and "PUBLICPRIVATE" (school category), pipe data frame into the summarize function to obtain means of student faculty and tuition and fees for the grouping, and the finally pipe the data frame into the ggplot function.
-
-This data is interesting because:
-1. With a quick glance, you can see that schools with students that receive the highest pell grants on average have, on average, the lowest tuition rates. 
-2. In the case of both types of private schools, it is evident that schools with students who receive the highest pell grants on average, have, on average, the highest student faculty ratios. 
-3. In all three types of schools, schools with students who receive average pell grants that rank in the 3rd quartile have the highest tuition and fees.
-
-Questions that arise from this visualization include:
-1. Why do schools with students who receive pell grant amounts that rank in the highest quartile have the cheapest tuition and fees? Could schools be actively trying to appeal to economically disadvantaged students - those who receive pell grants - by having relatively low tuition and fees?
-
-2. Do the same schools mentioned in number one make up for the fact that their tutition and fees are on average lower by highering less faculty, thus resulting in the higher student:faculty ratios seen in both types of private schools?
-
-
-```{r}
-source("../02 Data Wrangling/plot3.R", echo = TRUE)
-```
-

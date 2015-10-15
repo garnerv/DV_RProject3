@@ -1,11 +1,11 @@
-setwd("C:/Users/Wes James/Documents/Data Visualization/DV_RProject3/01 Data")
+setwd("/Users/Garner/DV_RProject3/01 Data")
 file_path <- "2010CensusPopulationData.csv"
 
 # str(df) # Uncomment this and  run just the lines to here to get column types to use for getting the list of measures.
 
 df <- read.csv(file_path, stringsAsFactors = FALSE)
 
-measures <- c("Zip", "Population", "PopulationMale", "PopulationFemale", "MedianAge", "MedianAgeMale", "MedianAgeFemale", "PopulationRaceWhite", "PopulationRaceBlack", "PopulationAmerindian", "PopulationRaceAsian", "PopulationRacePacific", "PopulationRaceOther", "PopulationRaceMulti","PopulationRaceLatino", "Households", "HusbandWifeHouseholds", "SingleFatherHousehold", "SingleMotherHousehold", "NonFamilyHouseholds", "HouseHolder15to24","HouseHolder25to34", "HouseHolder35to44", "HouseHolder45to54", "HouseHolder55to59", "HouseHolder60to64", "HouseHolder65to74", "HouseHolder75to84", "HouseHolder85over", "HouseholdsWith60Plus", "HouseholdsWith75Plus", "Households2Person", "Households3Person", "Households4Person", "Households5Person", "Households6Person", "Households7PlusPerson") 
+measures <- c("Population", "PopulationMale", "PopulationFemale", "MedianAge", "MedianAgeMale", "MedianAgeFemale", "PopulationRaceWhite", "PopulationRaceBlack", "PopulationAmerindian", "PopulationRaceAsian", "PopulationRacePacific", "PopulationRaceOther", "PopulationRaceMulti","PopulationRaceLatino", "Households", "HusbandWifeHouseholds", "SingleFatherHousehold", "SingleMotherHousehold", "NonFamilyHouseholds", "HouseHolder15to24","HouseHolder25to34", "HouseHolder35to44", "HouseHolder45to54", "HouseHolder55to59", "HouseHolder60to64", "HouseHolder65to74", "HouseHolder75to84", "HouseHolder85over", "HouseholdsWith60Plus", "HouseholdsWith75Plus", "Households2Person", "Households3Person", "Households4Person", "Households5Person", "Households6Person", "Households7PlusPerson") 
 
 #measures <- NA # Do this if there are no measures.
 
