@@ -1,10 +1,25 @@
-#pull in dataframe from oracle excluding universities with zero dollar tuition and fees
-df <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from COLLEGESTATS where tuitionfees1314 is not null"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_gv4353', PASS='orcl_gv4353', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
+census <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from CENSUSDATA"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_gv4353', PASS='orcl_gv4353', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
+
+income <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from INCOMEDATA"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_gv4353', PASS='orcl_gv4353', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
+
+#make a join data frame using inner join
+join <- dplyr::outer_join(census, income, by="ZIP") %>% tbl_df
 
 
-df <- df %>% mutate(pell_percent = cume_dist(AVGAMTFIRSTTIMEUGPELL))
-levels <- c(0, .25, .5, .75, 1)
-labels <- c("4th Q Highest Pell Grant", "3rd Q Highest Pell Grant", "2nd Q Highest Pell Grant", "1st Q Highest Pell Grant")
-df <- df %>% filter(AVGAMTFIRSTTIMEUGPELL != "null") %>% mutate(x = cut(pell_percent, levels, labels = labels))
+#add a new grouping by net income cum distribution
+join <- join %>% mutate(net_income = cume_dist(NETINCOME))
 
-df %>% group_by(x, PUBLICPRIVATE) %>% summarise(mean_fac = mean(as.numeric(STUDENTFACULTYRATIO)), n=n(), mean_tuition = mean(as.numeric(TUITIONFEES1314))) %>% ggplot(aes(x=mean_fac, y=mean_tuition, color=x)) + geom_point(size=5) + facet_wrap(~PUBLICPRIVATE) + labs(title='Mean Average Faculty\n vs. Mean Tuition and Fees (Year 13-14)\n, Grouped by Quartile Ranking\n of Highest Average Pell Grants Students Receive') + labs(x="Average Student:Faculty Ratio", y=paste("Tuition and Fees for 2013-2014 Academic School Year ($)"))
+#add a new column to get average salaries/wages per person
+join <- within (join, twoparentP <- HUSBANDWIFEHOUSEHOLDS/HOUSEHOLDS)
+join <- join %>% mutate(twoparent_percentile = cume_dist(twoparentP))
+
+#get salaries and wages per person in the population
+join <- within (join, avgIncome <- NETINCOME/POPULATION)
+
+#group population sizes into S/M/L
+levels <- c(0, .33, .66, 1)
+labels <- c("Small", "Medium", "Large")
+join <- join %>% mutate(NetIncome = cut(net_income, levels, labels = labels))
+
+#add a new column to the dataframe using the mutate function. graph using ggplot.
+join %>% mutate(netinc_percent = cume_dist(avgIncome)) %>% ggplot(aes(x = netinc_percent, y = twoparent_percentile)) + geom_point(aes(color=NetIncome)) + facet_wrap(~NetIncome) + labs(title='Percentile of Average Net Income Per Person in Every US Zip Code\n by Percentile of Husband and Wife Households\n in the Same Zip Code') + labs(x="Percentile of Average Net Income Per Individual", y=paste("Percentile of Husband and Wife Households in Zip Code"))
