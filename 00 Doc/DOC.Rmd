@@ -92,4 +92,3 @@ Leading Questions About this Data:
 ```{r}
 source("../02 Data Wrangling/plot3.R", echo = TRUE)
 ```
-
