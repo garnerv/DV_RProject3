@@ -1,5 +1,6 @@
-setwd("/Users/Garner/DV_RProject3/01 Data")
+setwd("C:/Users/Wes James/Documents/Data Visualization/DV_RProject3/01 Data")
 file_path <- "2010CensusPopulationData.csv"
+getwd()
 
 # str(df) # Uncomment this and  run just the lines to here to get column types to use for getting the list of measures.
 
