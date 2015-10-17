@@ -48,3 +48,48 @@ Leading Questions About this Data:
 ```{r}
 source("../02 Data Wrangling/plot1.R", echo = TRUE)
 ```
+
+###Plot #2:
+First, the income and census data frames were joined by zip code using a dpylr outer join function. Then, two new columns were added to the new table. We found the percentage of Husband and Wife Households in each zip code, and then made another new column to analyze them by percentile. (twoparentP and twoparent_percentile)
+
+Next, we found the average AGI (Adjustable Gross Income) reported on each tax return by the population size in each zip code. (avgAGIncome)
+
+We then classified each zip code by its relative Net Income using the cumulative distribution of the size of the population. The categories "Small", "Medium", and "Large" represent the smallest third, medium third, and largest zip codes by Net Income size percentile.
+
+Finally, we mutated the average income column into percentiles for analysis and facet wrapped them for easy viewing.
+
+The first interesting thing about this plot is that it is related to the previous plot. Zip codes with a higher Net Income have more husband wife households with Higher AGI. Similarly, those with smaller Net Income have less husband wife households with Lower AGI.
+
+Finally, it appears that zip codes with more Husband Wife households tend to have relatively larger AGI per individual - note the heavy grouping of points in each zip code size grouping. Also note here is that there is an invers relationship of Husband Wife households and high AGI per zip code the larger the Net Income  of the zip code. 
+
+Leading Questions About this Data:
+1. Is the inverse relationship because with more couples with high Net Income the less likley the wife has to work? The low AGI could be that the wife makes no money andthe husband makes enough for both.
+
+2. The relation between the graphs is not surprising. But why does it seem so perfectly inverted? Is it just because there are many data points?
+
+```{r}
+source("../02 Data Wrangling/plot2.R", echo = TRUE)
+```
+
+###Plot #3:
+First, the income and census data frames were joined by zip code using a dpylr outer join function. Then, a new column was added for the percent of population in a table using the cumulative distribution function (pop_percent).  Later we made a facet wrap of small and large of this category for clarity of what we wanted to show.
+
+Next, we found the ratio of households with seven or more people to the total number of households. (SevenPlusRatio)
+
+We then classified each zip code by its relative population size using the cumulative distribution of the size of the population. The categories "Small" and "Large" represent the lower and upper half of zipcodes by population.
+
+Finally, we mutated the ratio column into percentiles for analysis and placed them on the x-axis with the Latino population average on the Y axis.
+
+Without the seperation of "small" and "large" you can't tell much on what is going on due to the many many data points. So since there is a seperation, you can see the correlation of higher percent of of households with seven or more people and a higher latino population.
+
+We tried this method with other races provided and the Latino curve showed the most.  We decided to leave out the other facet wrap because it would have made the total visualization much too crowded.  
+
+Leading Questions About this Data:
+1. Is this data accurate today? SInce this data is from 2010 I wonder if older or more modern data would show the same trend.
+
+2. This seems to imply the known stereotype the Latino families are usually much larger.
+
+```{r}
+source("../02 Data Wrangling/plot3.R", echo = TRUE)
+```
+

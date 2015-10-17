@@ -14,7 +14,7 @@ join <- within (join, twoparentP <- HUSBANDWIFEHOUSEHOLDS/HOUSEHOLDS)
 join <- join %>% mutate(twoparent_percentile = cume_dist(twoparentP))
 
 #get salaries and wages per person in the population
-join <- within (join, avgIncome <- NETINCOME/POPULATION)
+join <- within (join, avgAGIncome <- ADJUSTGROSSINCOME/POPULATION)
 
 #group population sizes into S/M/L
 levels <- c(0, .33, .66, 1)
@@ -22,4 +22,4 @@ labels <- c("Small", "Medium", "Large")
 join <- join %>% mutate(NetIncome = cut(net_income, levels, labels = labels))
 
 #add a new column to the dataframe using the mutate function. graph using ggplot.
-join %>% mutate(netinc_percent = cume_dist(avgIncome)) %>% ggplot(aes(x = netinc_percent, y = twoparent_percentile)) + geom_point(aes(color=NetIncome)) + facet_wrap(~NetIncome) + labs(title='Percentile of Average Net Income Per Person in Every US Zip Code\n by Percentile of Husband and Wife Households\n in the Same Zip Code') + labs(x="Percentile of Average Net Income Per Individual", y=paste("Percentile of Husband and Wife Households in Zip Code"))
+join %>% mutate(netinc_percent = cume_dist(avgAGIncome)) %>% ggplot(aes(x = netinc_percent, y = twoparent_percentile)) + geom_point(aes(color=NetIncome)) + facet_wrap(~NetIncome) + labs(title='Percentile of Average Net Income Per Person in Every US Zip Code\n by Percentile of Husband and Wife Households\n in the Same Zip Code') + labs(x="Percentile of Average Adjust Gross Income Per Individual", y=paste("Percentile of Husband and Wife Households in Zip Code"))

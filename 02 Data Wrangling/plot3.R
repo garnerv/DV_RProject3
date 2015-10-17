@@ -3,23 +3,18 @@ census <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/
 income <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from INCOMEDATA"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_gv4353', PASS='orcl_gv4353', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
 
 #make a join data frame using inner join
-join <- dplyr::outer_join(census, income, by="ZIP") %>% tbl_df
+join <- dplyr::inner_join(census, income, by="ZIP") %>% tbl_df
 
+#add a new grouping by population size cum distribution
+join <- join %>% mutate(pop_percent = cume_dist(POPULATION))
 
-#add a new grouping by net income cum distribution
-join <- join %>% mutate(net_income = cume_dist(NETINCOME))
+#add a new column to get Ratio of households with seven or more
+join <- within (join, SevenPlusRatio <- HOUSEHOLDS7PLUSPERSON/HOUSEHOLDS)
 
-#add a new column to get average salaries/wages per person
-join <- within (join, twoparentP <- HUSBANDWIFEHOUSEHOLDS/HOUSEHOLDS)
-join <- join %>% mutate(twoparent_percentile = cume_dist(twoparentP))
-
-#get salaries and wages per person in the population
-join <- within (join, avgIncome <- NETINCOME/POPULATION)
-
-#group population sizes into S/M/L
-levels <- c(0, .33, .66, 1)
-labels <- c("Small", "Medium", "Large")
-join <- join %>% mutate(NetIncome = cut(net_income, levels, labels = labels))
+#group population sizes into S/L
+levels <- c(0, .5, 1)
+labels <- c("Small", "Large")
+join <- join %>% mutate(PopSize = cut(pop_percent, levels, labels = labels))
 
 #add a new column to the dataframe using the mutate function. graph using ggplot.
-join %>% mutate(netinc_percent = cume_dist(avgIncome)) %>% ggplot(aes(x = netinc_percent, y = twoparent_percentile)) + geom_point(aes(color=NetIncome)) + facet_wrap(~NetIncome) + labs(title='Percentile of Average Net Income Per Person in Every US Zip Code\n by Percentile of Husband and Wife Households\n in the Same Zip Code') + labs(x="Percentile of Average Net Income Per Individual", y=paste("Percentile of Husband and Wife Households in Zip Code"))
+join %>% mutate(SevenPlusPercent = cume_dist(SevenPlusRatio)) %>% ggplot(aes(x = SevenPlusPercent, y = POPULATIONRACELATINO)) + geom_point(aes(color=PopSize)) + facet_wrap(~PopSize) + labs(title='Percentile of Households with 7 or more \n by Percentile of Population of Latino Race') + labs(x="Percentile of Households with Seven Plus" ,  y=paste("Percentile of Population with Latino Race"))
